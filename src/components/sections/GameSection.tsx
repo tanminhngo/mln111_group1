@@ -189,15 +189,7 @@ const scenes: GameScene[] = [
     id: 7,
     title: "CẢNH 8 — NHÓM CHAT TÀI XẾ",
     character: characters.huy,
-    dialogue: [
-      "📱 NHÓM CHAT TÀI XẾ",
-      "Người 1: Không chạy thì lấy gì ăn?",
-      "Người 2: Càng im lặng thì họ càng ép.",
-      "Huy: Một người nghỉ thì không ai quan tâm.",
-      "Huy: Nhưng hàng nghìn người cùng tắt app thì khác.",
-      "Huy: Có ai dám cùng nhau đấu tranh không?",
-      "Minh: ... Mình cân nhắc..."
-    ],
+    dialogue: [],
     choices: [
       { 
         text: "Tắt app cùng mọi người (tham gia đấu tranh)", 
@@ -218,7 +210,8 @@ const scenes: GameScene[] = [
       { sender: "Huy", avatar: "👨‍💻", message: "Một mình khó kháng cự. Nhưng nếu cùng nhau..." },
       { sender: "Lê Sơn", avatar: "👨‍💻", message: "Hẹn thứ ba - ai cũng tắt app, 2 tiếng" },
       { sender: "Trần Minh", avatar: "👨‍💻", message: "Tôi support! Sức mạnh tập thể!" },
-      { sender: "Nguyễn Hải", avatar: "👨‍💼", message: "Gợi ý mà, không bắt buộc. Mỗi người lựa chọn" }
+      { sender: "Nguyễn Hải", avatar: "👨‍💼", message: "Gợi ý mà, không bắt buộc. Mỗi người lựa chọn" },
+      { sender: "Minh", avatar: "👨‍💼", message: "Mình có nên... có nên cân nhắc không..." }
     ]
   },
   {
@@ -299,6 +292,7 @@ export function GameSection() {
     kpi: 0
   })
   const [displayedDialogue, setDisplayedDialogue] = useState(0)
+  const [displayedPhoneMessages, setDisplayedPhoneMessages] = useState(0)
   const [gameComplete, setGameComplete] = useState(false)
 
   const scene = scenes[currentScene]
@@ -329,6 +323,7 @@ export function GameSection() {
     setCurrentScene(0)
       setGameState({ money: 2000000, rating: 5, kpi: 0 })
     setDisplayedDialogue(0)
+    setDisplayedPhoneMessages(0)
     setGameComplete(false)
   }
 
@@ -336,8 +331,8 @@ export function GameSection() {
     return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', 'đ')
   }
 
-  const PhoneScreen = ({ messages }: { messages: PhoneMessage[] }) => (
-    <div className="bg-black rounded-3xl border-8 border-gray-900 shadow-2xl overflow-hidden max-h-[600px] flex flex-col">
+  const PhoneScreen = ({ messages, displayCount = messages.length }: { messages: PhoneMessage[], displayCount?: number }) => (
+    <div className="bg-black rounded-3xl border-8 border-gray-900 shadow-2xl overflow-hidden max-h-[900px] flex flex-col">
       {/* Phone Header */}
       <div className="bg-gray-900 text-white px-4 py-2 flex items-center justify-between text-xs">
         <span>9:41</span>
@@ -347,12 +342,12 @@ export function GameSection() {
 
       {/* Chat Messages */}
       <div className="flex-1 overflow-y-auto bg-gray-100 p-4 space-y-3">
-        {messages.map((msg, idx) => (
+        {messages.slice(0, displayCount).map((msg, idx) => (
           <motion.div
             key={`msg-${idx}-${msg.sender}`}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
+            transition={{ delay: idx * 0.05 }}
             className="flex gap-2"
           >
             <span className="text-2xl flex-shrink-0">{msg.avatar}</span>
