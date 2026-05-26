@@ -8,7 +8,7 @@ import { StruggleTheorySection } from "./components/sections/StruggleTheorySecti
 import { TraditionalFormsSection } from "./components/sections/TraditionalFormsSection"
 import { ModernStruggleSection } from "./components/sections/ModernStruggleSection"
 
-import { GamePlaceholderSection } from "./components/sections/GamePlaceholderSection"
+import { GameSection } from "./components/sections/GameSection"
 import { AnalysisPlaceholderSection } from "./components/sections/AnalysisPlaceholderSection"
 import { CollectiveOfflineSection } from "./components/sections/CollectiveOfflineSection"
 import { HistoricalComparisonSection } from "./components/sections/HistoricalComparisonSection"
@@ -26,7 +26,7 @@ function App() {
         <StruggleTheorySection />
         <TraditionalFormsSection />
         <ModernStruggleSection />
-        <GamePlaceholderSection />
+        <GameSection />
         <AnalysisPlaceholderSection />
         <CollectiveOfflineSection />
         <HistoricalComparisonSection />
