@@ -140,12 +140,12 @@ const scenes: GameScene[] = [
     ],
     choices: [
       {
-        text: "Chấp nhận cuốc (khổ)",
+        text: "Chấp nhận cuốc",
         nextScene: 5,
         impact: { money: 150000, rating: -0.2 }
       },
       {
-        text: "Hủy cuốc (bị phạt)",
+        text: "Hủy cuốc",
         nextScene: 5,
         impact: { kpi: 20 }
       }
@@ -308,14 +308,21 @@ export function GameSection() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [gameStarted, setGameStarted] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isPortrait, setIsPortrait] = useState(false)
 
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobile(window.innerWidth < 768)
+    const checkLayout = () => {
+      const mobile = window.innerWidth < 768
+      setIsMobile(mobile)
+      setIsPortrait(window.innerHeight > window.innerWidth && window.innerWidth < 1024)
     }
-    handleResize()
-    window.addEventListener("resize", handleResize)
-    return () => window.removeEventListener("resize", handleResize)
+    checkLayout()
+    window.addEventListener("resize", checkLayout)
+    window.addEventListener("orientationchange", checkLayout)
+    return () => {
+      window.removeEventListener("resize", checkLayout)
+      window.removeEventListener("orientationchange", checkLayout)
+    }
   }, [])
 
   const toggleFullscreen = () => {
@@ -510,12 +517,37 @@ export function GameSection() {
 
         {!gameComplete ? (
           <div className="flex flex-col gap-6">
-            {/* The Main Stage (Genshin cinematic aspect ratio, responsive) */}
+            {/* The Main Stage (Enforced landscape aspect ratio, co-proportional scaling) */}
             <div
               ref={stageRef}
               onClick={handleStageClick}
-              className="relative w-full aspect-[4/3] sm:aspect-[16/10] md:aspect-[16/9] min-h-[520px] md:min-h-0 bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#e0d9d0] cursor-pointer group select-none flex flex-col justify-between p-4 md:p-6"
+              className="relative w-full aspect-[16/9] bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#e0d9d0] cursor-pointer group select-none flex flex-col justify-between p-3 sm:p-6"
             >
+              {/* Screen Orientation Prompt Overlay */}
+              {isPortrait && (
+                <div className="absolute inset-0 z-50 flex flex-col items-center justify-center text-center p-6 bg-black/90 backdrop-blur-md pointer-events-auto cursor-default animate-fade-in">
+                  <motion.div
+                    initial={{ scale: 0.9, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    className="max-w-xs flex flex-col items-center justify-center"
+                  >
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 mb-3 sm:mb-4 text-accent-gold animate-pulse flex items-center justify-center bg-accent-gold/10 rounded-full border border-accent-gold/25">
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="animate-spin-slow"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                    </div>
+                    <h4 className="text-[#FAF6EE] font-serif font-bold text-xs sm:text-lg mb-1 sm:mb-2">Trải Nghiệm Tốt Nhất 📱</h4>
+                    <p className="text-[9px] sm:text-xs text-slate-300 font-serif leading-relaxed mb-3 sm:mb-4">
+                      Vui lòng **xoay ngang điện thoại** để chơi game với giao diện và nhân vật đẹp mắt nhất giống như trên máy tính!
+                    </p>
+                    <button 
+                      onClick={() => setIsPortrait(false)}
+                      className="px-3 py-1.5 sm:px-4 sm:py-2 bg-accent-red hover:bg-red-800 text-[#FAF6EE] text-[8px] sm:text-xs font-serif font-bold rounded-lg transition-all cursor-pointer shadow-md"
+                    >
+                      Tiếp tục ở màn hình dọc
+                    </button>
+                  </motion.div>
+                </div>
+              )}
+
               {/* Cinematic Background Video */}
               <video
                 src="/hinh_nen.mp4"
@@ -634,7 +666,7 @@ export function GameSection() {
                   <motion.div
                     animate={{
                       opacity: present.minh ? (activeSpeakerKey === "minh" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
-                      scale: present.minh ? (activeSpeakerKey === "minh" ? (isMobile ? 1.15 : 1.55) : (isMobile ? 0.95 : 1.35)) : 0.8,
+                      scale: present.minh ? (activeSpeakerKey === "minh" ? 1.55 : 1.35) : 0.8,
                       x: present.minh ? (isMobile ? 5 : 25) : -100,
                       filter: activeSpeakerKey === "minh" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
                     }}
@@ -642,9 +674,9 @@ export function GameSection() {
                     className="relative w-[32%] h-[100%] flex items-end justify-center origin-bottom shrink-0"
                   >
                     <img
-                      src="/characters/minh.png"
-                      alt="Minh"
-                      className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                       src="/characters/minh.png"
+                       alt="Minh"
+                       className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
                     />
                   </motion.div>
 
@@ -652,7 +684,7 @@ export function GameSection() {
                   <motion.div
                     animate={{
                       opacity: present.company ? (activeSpeakerKey === "company" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
-                      scale: present.company ? (activeSpeakerKey === "company" ? (isMobile ? 1.15 : 1.55) : (isMobile ? 0.95 : 1.35)) : 0.8,
+                      scale: present.company ? (activeSpeakerKey === "company" ? 1.55 : 1.35) : 0.8,
                       x: present.company ? (isMobile ? 5 : 15) : -50,
                       filter: activeSpeakerKey === "company" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
                     }}
@@ -670,7 +702,7 @@ export function GameSection() {
                   <motion.div
                     animate={{
                       opacity: present.ai ? (activeSpeakerKey === "ai" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
-                      scale: present.ai ? (activeSpeakerKey === "ai" ? (isMobile ? 1.18 : 1.6) : (isMobile ? 0.95 : 1.38)) : 0.8,
+                      scale: present.ai ? (activeSpeakerKey === "ai" ? 1.6 : 1.38) : 0.8,
                       y: present.ai ? (activeSpeakerKey === "ai" ? -8 : 0) : 100,
                       x: present.ai ? (isMobile ? -5 : -15) : 50,
                       filter: activeSpeakerKey === "ai" ? "brightness(1.1)" : "brightness(0.55)"
@@ -689,7 +721,7 @@ export function GameSection() {
                   <motion.div
                     animate={{
                       opacity: present.huy ? (activeSpeakerKey === "huy" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
-                      scale: present.huy ? (activeSpeakerKey === "huy" ? (isMobile ? 1.15 : 1.55) : (isMobile ? 0.95 : 1.35)) : 0.8,
+                      scale: present.huy ? (activeSpeakerKey === "huy" ? 1.55 : 1.35) : 0.8,
                       x: present.huy ? (isMobile ? -5 : -25) : 100,
                       filter: activeSpeakerKey === "huy" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
                     }}
@@ -845,19 +877,19 @@ export function GameSection() {
               {displayedDialogue >= scene.dialogue.length - 1 &&
                 (!scene.phoneMessages || displayedPhoneMessages >= scene.phoneMessages.length) &&
                 scene.choices && scene.choices.length > 0 && (
-                  <div className="absolute md:right-6 bottom-4 md:top-1/2 md:-translate-y-1/2 left-4 right-4 md:left-auto md:w-80 flex flex-col gap-2 md:gap-3.5 z-40 choice-container pointer-events-auto">
+                  <div className="absolute right-3 sm:right-6 top-[40%] sm:top-1/2 -translate-y-1/2 w-[65%] sm:w-80 max-w-[230px] sm:max-w-none flex flex-col gap-1.5 sm:gap-3.5 z-40 choice-container pointer-events-auto">
                     {scene.choices.map((choice, idx) => (
                       <motion.button
                         key={`choice-${scene.id}-${idx}`}
-                        initial={{ opacity: 0, y: isMobile ? 15 : 0, x: isMobile ? 0 : 30 }}
-                        animate={{ opacity: 1, y: 0, x: 0 }}
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: idx * 0.15, type: "spring", stiffness: 120 }}
-                        whileHover={{ scale: 1.02, x: isMobile ? 0 : 5 }}
+                        whileHover={{ scale: 1.02, x: 5 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => handleChoice(choice)}
-                        className="w-full text-left p-3 md:p-4 bg-black/90 backdrop-blur-md border border-[#b8860b]/40 text-[#FAF6EE] rounded-xl hover:border-accent-red hover:bg-[#1a1410] shadow-lg transition-all flex items-center justify-between group cursor-pointer pointer-events-auto"
+                        className="w-full text-left p-2 sm:p-4 bg-black/90 backdrop-blur-md border border-[#b8860b]/40 text-[#FAF6EE] rounded-xl hover:border-accent-red hover:bg-[#1a1410] shadow-lg transition-all flex items-center justify-between group cursor-pointer pointer-events-auto"
                       >
-                        <span className="text-[10px] md:text-xs font-serif font-semibold pr-2 leading-relaxed">
+                        <span className="text-[9px] sm:text-xs font-serif font-semibold pr-2 leading-relaxed">
                           {choice.text}
                         </span>
                         <ChevronRight className="w-3.5 h-3.5 text-accent-gold group-hover:text-accent-red transition-colors shrink-0" />
