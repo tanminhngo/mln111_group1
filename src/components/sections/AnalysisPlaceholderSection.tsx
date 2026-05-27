@@ -1,7 +1,6 @@
 import { motion } from "framer-motion"
 import { Card, CardContent, CardHeader, CardTitle } from "../ui/card"
-import { Badge } from "../ui/badge"
-import { Car, Briefcase, Smartphone, Scale, Wallet, BrainCircuit, Zap, CheckCircle } from "lucide-react"
+import { Briefcase, Smartphone, Scale, Wallet, BrainCircuit, Zap, CheckCircle } from "lucide-react"
 
 export function AnalysisPlaceholderSection() {
   const containerVariants = {
