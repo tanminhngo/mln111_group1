@@ -1,8 +1,8 @@
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import { useState, useEffect, useRef } from "react"
+import { motion } from "framer-motion"
 import { Card, CardContent } from "../ui/card"
 import { Button } from "../ui/button"
-import { RotateCcw, ChevronRight } from "lucide-react"
+import { RotateCcw, ChevronRight, Wallet, Star, Flame, Landmark, Maximize2, Minimize2 } from "lucide-react"
 
 interface GameChoice {
   text: string
@@ -18,6 +18,7 @@ interface Character {
   name: string
   avatar: string
   role: string
+  image: string
 }
 
 interface PhoneMessage {
@@ -39,10 +40,10 @@ interface GameScene {
 }
 
 const characters = {
-  minh: { name: "Minh", avatar: "👨‍💼", role: "Tài xế mới" },
-  huy: { name: "Huy", avatar: "👨‍💻", role: "Tài xế lâu năm" },
-  ai: { name: "AI System", avatar: "🤖", role: "Hệ thống ứng dụng" },
-  company: { name: "Đại diện công ty", avatar: "💼", role: "Quản lý nền tảng" },
+  minh: { name: "Minh", avatar: "👨‍💼", role: "Tài xế mới", image: "/characters/minh.png" },
+  huy: { name: "Huy", avatar: "👨‍💻", role: "Tài xế lâu năm", image: "/characters/huy.png" },
+  ai: { name: "AI System", avatar: "🤖", role: "Hệ thống ứng dụng", image: "/characters/ai.png" },
+  company: { name: "CEO Nền Tảng", avatar: "💼", role: "Quản lý nền tảng", image: "/characters/ceo.png" },
 }
 
 const scenes: GameScene[] = [
@@ -72,7 +73,7 @@ const scenes: GameScene[] = [
       "🤖 AI System: Có 5 cuốc chờ bạn!",
       "Minh: Dễ quá! Cuốc nào cũng nhận được.",
       "[Sau 3 giờ làm việc]",
-      "✅ Kiếm được: 450.000đ",
+      "💰 Kiếm được: 450.000đ",
       "⭐ Khách đánh giá: 5.0 sao (5 chuyến 5 sao)",
       "Minh: Mình thật sự đang làm chủ!"
     ],
@@ -92,13 +93,13 @@ const scenes: GameScene[] = [
       "Minh: Ồ, 500k thưởng? Chạy tiếp vậy..."
     ],
     choices: [
-      { 
-        text: "Tiếp tục chạy để nhận thưởng", 
-        nextScene: 3,
+      {
+        text: "Tiếp tục chạy để nhận thưởng",
+        nextScene: 4,
         impact: { money: 500000 }
       },
-      { 
-        text: "Tắt app và nghỉ", 
+      {
+        text: "Tắt app và nghỉ",
         nextScene: 3,
         impact: { money: 0, kpi: 10 }
       }
@@ -106,6 +107,24 @@ const scenes: GameScene[] = [
   },
   {
     id: 3,
+    title: "CẢNH 3B — TỰ DO TRONG KHUÔN KHỔ",
+    character: characters.ai,
+    dialogue: [
+      "[Minh quyết định tắt app và về nhà nghỉ ngơi]",
+      "Minh: Cuối cùng cũng được nghỉ. Làm chủ thời gian thật sướng!",
+      "[Ngày hôm sau, Minh bật app trở lại hào hứng]",
+      "🤖 AI System: ⚠️ CẢNH BÁO: Tỷ lệ online trong giờ cao điểm của bạn giảm dưới 60%.",
+      "🤖 AI System: Mức độ ưu tiên nhận cuốc của bạn đã bị hạ thấp.",
+      "Minh: Hả? Mình được tự do tắt app cơ mà? Sao lại bị giảm ưu tiên?",
+      "🤖 AI System: Để khôi phục mức độ ưu tiên, bạn bắt buộc phải hoàn thành cuốc xe tiếp theo.",
+      "Minh: Thật vô lý! Nhưng mình không còn lựa chọn nào khác..."
+    ],
+    choices: [
+      { text: "Bắt đầu nhận cuốc mới", nextScene: 4 }
+    ]
+  },
+  {
+    id: 4,
     title: "CẢNH 4 — KHÔNG ĐƯỢC QUYỀN LỰA CHỌN",
     character: characters.ai,
     dialogue: [
@@ -120,35 +139,39 @@ const scenes: GameScene[] = [
       "🤖 AI System: Tiếp tục hủy sẽ bị hạn chế quyền chọn cuốc."
     ],
     choices: [
-      { 
-        text: "Chấp nhận cuốc (khổ)", 
-        nextScene: 4,
+      {
+        text: "Chấp nhận cuốc (khổ)",
+        nextScene: 5,
         impact: { money: 150000, rating: -0.2 }
       },
-      { 
-        text: "Hủy cuốc (bị phạt)", 
-        nextScene: 4,
+      {
+        text: "Hủy cuốc (bị phạt)",
+        nextScene: 5,
         impact: { kpi: 20 }
       }
     ]
   },
   {
-    id: 4,
+    id: 5,
     title: "CẢNH 5 — ÁP LỰC ĐÁNH GIÁ SAO",
     character: characters.ai,
     dialogue: [
-      "[Một khách khó tính đánh giá 1 sao dù Minh không làm sai]",
-      "Minh: Gì vậy? Mình đã hoàn thành rất tốt mà!",
-      "🤖 AI System: ⚠️ Điểm đánh giá của bạn đang giảm.",
-      "🤖 AI System: Tài khoản có nguy cơ bị hạn chế nếu tiếp tục.",
-      "Minh: Nhưng mình không làm sai gì cả... Minh chỉ là tài xế!"
+      "[Cho dù chấp nhận cuốc xe bão táp hay hủy để nhận cuốc khác, áp lực mưu sinh vẫn đẩy Minh vào những hành trình đầy căng thẳng...]",
+      "[Ting! Tiếng chuông báo hoàn thành chuyến đi. Nhưng đi kèm là một thông báo bất ngờ không mấy vui vẻ...]",
+      "🤖 AI System: ⚠️ THÔNG BÁO: Khách hàng vừa đánh giá chuyến đi vừa rồi của bạn 1 SAO.",
+      "Minh: Cái gì?! Đánh giá 1 sao? Mình đã lái xe vô cùng cẩn thận, thái độ rất lịch sự mà!",
+      "[Ý kiến phản hồi từ khách: \"Tài xế đi quá chậm, làm trễ giờ hẹn quan trọng của tôi!\"]",
+      "Minh: Kẹt xe giờ cao điểm kẹt cứng ngắc, mình đâu thể bay được! Khách đi trễ giờ lại đổ hết lỗi lên đầu tài xế?",
+      "🤖 AI System: ⚠️ CẢNH BÁO: Điểm đánh giá (Rating) trung bình của bạn đang giảm dưới tiêu chuẩn.",
+      "🤖 AI System: Tài khoản có nguy cơ bị khóa/hạn chế nhận cuốc nếu tiếp tục nhận đánh giá thấp.",
+      "Minh: Thật bất công! Minh sở hữu xe, tự đổ xăng, tự chạy... nhưng chỉ vì một đánh giá chủ quan của khách hàng và thuật toán vô cảm, mình có thể bị tước quyền kiếm sống bất cứ lúc nào!"
     ],
     choices: [
-      { text: "Tiếp tục", nextScene: 5, impact: { rating: 0 } }
+      { text: "Tiếp tục", nextScene: 6, impact: { rating: -0.3 } }
     ]
   },
   {
-    id: 5,
+    id: 6,
     title: "CẢNH 6 — CHI PHÍ TĂNG CAO",
     character: characters.huy,
     dialogue: [
@@ -161,46 +184,52 @@ const scenes: GameScene[] = [
       "Minh: Vậy mình đang làm gì? Đối tác hay nhân viên?"
     ],
     choices: [
-      { text: "Tiếp tục chạy", nextScene: 6 }
+      { text: "Tiếp tục chạy", nextScene: 7 }
     ]
   },
   {
-    id: 6,
+    id: 7,
     title: "CẢNH 7 — TĂNG CHIẾT KHẤU",
     character: characters.company,
     dialogue: [
-      "📧 THÔNG BÁO TỪ NỀN TẢNG",
-      "💼 Đại diện công ty: Nhằm nâng cao trải nghiệm khách hàng,",
-      "💼 Đại diện công ty: mức chiết khấu sẽ tăng từ 25% lên 30%.",
-      "[Minh tính toán lại...]",
-      "Minh: 30%? Chạy nhiều hơn mà tiền ít hơn?",
-      "Huy (qua tin nhắn): Đối tác mà không có quyền thương lượng thì có thật sự là đối tác không?",
-      "Minh: Anh nói đúng..."
+      "💼 CEO Nền Tảng: Chào các đối tác! Nhằm nâng cấp trải nghiệm khách hàng và tối ưu hóa hệ thống vận hành...",
+      "💼 CEO Nền Tảng: Chúng tôi đã đầu tư hàng triệu USD vào thuật toán AI mới để giúp các bạn nhận cuốc nhanh hơn 15%.",
+      "💼 CEO Nền Tảng: Để tài trợ cho các chiến dịch khuyến mãi thu hút khách hàng – trực tiếp mang lại NHIỀU ĐƠN HÀNG HƠN cho tài xế...",
+      "💼 CEO Nền Tảng: Chúng tôi xin thông báo điều chỉnh nhẹ tỷ lệ phí sử dụng ứng dụng (chiết khấu) từ 25% lên 30%, áp dụng từ tuần tới.",
+      "💼 CEO Nền Tảng: Đây là bước đi cần thiết để xây dựng một hệ sinh thái bền vững và cùng nhau phát triển lâu dài!",
+      "[Minh bàng hoàng tính toán lại chi phí trên điện thoại...]",
+      "Minh: Cái gì?! Tăng thêm tới 5% chiết khấu mà gọi là 'điều chỉnh nhẹ' sao?",
+      "Minh: Họ nói là tài trợ khuyến mãi kích cầu, nhưng thực chất tiền khuyến mãi đó lại trừ thẳng vào công sức của tài xế chạy ròng rã ngoài đường!",
+      "Minh: Tính ra cứ chạy 10 cuốc xe thì bị công ty thu mất trắng 3 cuốc. Chạy nhiều hơn nhưng thu nhập thực tế giảm thảm hại!",
+      "Huy: Thấy chưa Minh? Cốt lõi của kinh tế nền tảng số là đây.",
+      "Huy: Một chính sách bóc lột thay đổi chỉ bằng một thông báo một chiều trên app. 'Đối tác tự do' gì mà không có bất kỳ quyền thương lượng nào?",
+      "Huy: Chúng ta chỉ là những người làm thuê kiểu mới, bán sức lao động và tự gánh chịu rủi ro hao mòn phương tiện cho giới chủ công nghệ bóc lột mà thôi.",
+      "Minh: Anh nói đúng... Quyền sinh sát hoàn toàn nằm trong tay họ. Chúng ta hoàn toàn bị động!"
     ],
     choices: [
-      { 
-        text: "Bức xúc nhưng tiếp tục", 
-        nextScene: 7,
+      {
+        text: "Bức xúc nhưng tiếp tục chạy",
+        nextScene: 8,
         impact: { money: -300000 }
       }
     ]
   },
   {
-    id: 7,
+    id: 8,
     title: "CẢNH 8 — NHÓM CHAT TÀI XẾ",
     character: characters.huy,
     dialogue: [
-        "Minh: Mình có nên ủng hộ họ không... cân nhắc có hay không?"
+      "Minh: Mình có nên ủng hộ họ không... cân nhắc có hay không?"
     ],
     choices: [
-      { 
-        text: "Tắt app cùng mọi người (tham gia đấu tranh)", 
-        nextScene: 9,
+      {
+        text: "Tắt app cùng mọi người (tham gia đấu tranh)",
+        nextScene: 10,
         impact: { kpi: -50 }
       },
-      { 
-        text: "Im lặng và tiếp tục chạy", 
-        nextScene: 8,
+      {
+        text: "Im lặng và tiếp tục chạy",
+        nextScene: 9,
         impact: { money: 400000 }
       }
     ],
@@ -216,70 +245,49 @@ const scenes: GameScene[] = [
     ]
   },
   {
-    id: 8,
+    id: 9,
     title: "KẾT THÚC - ENDING XẤU",
     isEnding: true,
     endingType: "bad",
     character: characters.ai,
     dialogue: [
-      "❌ KẾT CỤC",
       "🤖 AI System: Vì tỷ lệ hủy cao, tài khoản của bạn bị hạn chế.",
       "🤖 AI System: Bạn chỉ nhận được 20% cuốc gốc.",
       "🤖 AI System: Công việc trở nên rất khó khăn.",
-      "",
       "Minh: Sao vậy? Mình không làm sai gì cả...",
       "Huy: Bạn chọn một mình đối đầu với hệ thống.",
       "Huy: Người lao động riêng lẻ khó chống lại.",
-      "",
-      "💔 BÀI HỌC:",
-      "Khi bạn bị cô lập, hệ thống sẽ kiểm soát bạn dễ dàng."
+      "[💔 BÀI HỌC: Khi bạn bị cô lập, hệ thống sẽ kiểm soát bạn dễ dàng.]"
     ],
     choices: []
   },
   {
-    id: 9,
+    id: 10,
     title: "CẢNH 9 — TẮT APP TẬP THỂ",
     character: characters.ai,
     dialogue: [
       "[Đột ngột, cùng lúc hàng nghìn tài xế tắt app]",
-      "📱 TIN TỨC NÓNG",
-      "\"Hàng nghìn tài xế đồng loạt offline\"",
-      "\"để phản đối chính sách tăng chiết khấu\"",
-      "",
-      "🤖 AI System: ⚠️ LỰ DẠC CAO",
+      "🤖 AI System: ⚠️ CẢNH BÁO HỆ THỐNG: LƯỢNG XE GIẢM ĐỘT NGỘT",
       "🤖 AI System: Hiện tại chỉ có 15% tài xế online.",
-      "📊 Bản đồ: Rất ít xe",
-      "💰 Giá: Tăng 200%",
-      "😤 Khách: \"Không tìm được xe!\"",
-      "",
-      "Minh: Nó hoạt động thật đó!"
+      "[Bản đồ đỏ rực - Giá cước tăng vọt 200%]",
+      "Minh: Nó hoạt động thật đó! Sức mạnh của sự đoàn kết!"
     ],
     choices: [
-      { text: "Tiếp tục tắt app", nextScene: 10 }
+      { text: "Tiếp tục tắt app", nextScene: 11 }
     ]
   },
   {
-    id: 10,
+    id: 11,
     title: "KẾT THÚC - ENDING TỐT",
     isEnding: true,
     endingType: "good",
     character: characters.company,
     dialogue: [
-      " THÔNG BÁO - SAU 2 NGÀY",
-      "💼 Công ty: Chúng tôi sẵn sàng đối thoại với đại diện tài xế",
-      "💼 Công ty: về chính sách chiết khấu.",
-      "",
-      "📰 TIN TỨC",
-      "\"Công ty X App và tài xế đạt thỏa thuận mới\"",
-      "\"Giảm chiết khấu từ 30% về 27%\"",
-      "\"Bổ sung phí bảo hiểm toàn bộ tài xế\"",
-      "",
+      "💼 CEO Nền Tảng: Chúng tôi sẵn sàng đối thoại với đại diện tài xế về chính sách chiết khấu.",
+      "📰 TIN TỨC: Giảm chiết khấu từ 30% về 27% & Bổ sung phí bảo hiểm.",
       "Minh: Nó thực sự làm được!",
-      "Huy: Sức mạnh tập thể là vậy.",
-      "Huy: Bây giờ tài xế hiểu rồi:",
-      "Huy: Đấu tranh tập thể là cách bảo vệ quyền lợi.",
-      "",
-      "✅ CHIẾN THẮNG: Người lao động có tiếng nói"
+      "Huy: Sức mạnh tập thể là vậy. Bây giờ tài xế hiểu rồi: Đấu tranh tập thể là cách bảo vệ quyền lợi.",
+      "[✅ CHIẾN THẮNG: Người lao động đã tìm lại tiếng nói và sự tôn trọng.]"
     ],
     choices: []
   }
@@ -295,35 +303,146 @@ export function GameSection() {
   const [displayedDialogue, setDisplayedDialogue] = useState(0)
   const [displayedPhoneMessages, setDisplayedPhoneMessages] = useState(0)
   const [gameComplete, setGameComplete] = useState(false)
+  const chatContainerRef = useRef<HTMLDivElement>(null)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const [gameStarted, setGameStarted] = useState(false)
+
+  const toggleFullscreen = () => {
+    if (!stageRef.current) return
+
+    if (!document.fullscreenElement) {
+      stageRef.current.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`)
+      })
+    } else {
+      document.exitFullscreen()
+    }
+  }
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement)
+    }
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange)
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange)
+    }
+  }, [])
+
+  // Scroll to bottom of chat when new phone messages arrive without scrolling the whole page
+  useEffect(() => {
+    if (chatContainerRef.current) {
+      chatContainerRef.current.scrollTo({
+        top: chatContainerRef.current.scrollHeight,
+        behavior: "smooth"
+      })
+    }
+  }, [displayedPhoneMessages, currentScene])
 
   const scene = scenes[currentScene]
+  const currentLine = scene.dialogue[displayedDialogue] || ""
+
+  // Preload character images
+  useEffect(() => {
+    Object.values(characters).forEach((char) => {
+      const img = new Image()
+      img.src = char.image
+    })
+  }, [])
+
+  // Parse current dialogue line to determine type, speaker, and text
+  const parseLine = (line: string) => {
+    if (!line) return { type: "narrative", speaker: "", text: "" }
+
+    if (line.startsWith("[") && line.endsWith("]")) {
+      return { type: "action", speaker: "", text: line.slice(1, -1) }
+    }
+
+    const colonIndex = line.indexOf(":")
+    if (colonIndex !== -1) {
+      const speakerRaw = line.substring(0, colonIndex).trim()
+      const text = line.substring(colonIndex + 1).trim()
+
+      let speakerKey = ""
+      let speakerName = speakerRaw
+
+      const lowerSpeaker = speakerRaw.toLowerCase()
+      if (lowerSpeaker.includes("minh") && !lowerSpeaker.includes("bạn của minh")) {
+        speakerKey = "minh"
+        speakerName = "Minh"
+      } else if (lowerSpeaker.includes("huy")) {
+        speakerKey = "huy"
+        speakerName = "Huy"
+      } else if (lowerSpeaker.includes("ai") || lowerSpeaker.includes("system")) {
+        speakerKey = "ai"
+        speakerName = "AI System"
+      } else if (lowerSpeaker.includes("ceo") || lowerSpeaker.includes("đại diện") || lowerSpeaker.includes("công ty")) {
+        speakerKey = "company"
+        speakerName = "CEO Nền Tảng"
+      } else if (lowerSpeaker.includes("bạn của minh")) {
+        speakerKey = "friend"
+        speakerName = "Bạn của Minh"
+      }
+
+      return { type: "dialogue", speaker: speakerName, speakerKey, text }
+    }
+
+    return { type: "narrative", speaker: "", text: line }
+  }
+
+  const parsed = parseLine(currentLine)
+
+  // Scan current scene dialogue to see who is present
+  const getPresentCharacters = (dialogue: string[]) => {
+    const present = { minh: false, huy: false, ai: false, company: false }
+    dialogue.forEach((line) => {
+      const parsedLine = parseLine(line)
+      if (parsedLine.type === "dialogue" && parsedLine.speakerKey) {
+        if (parsedLine.speakerKey === "minh" || parsedLine.speakerKey === "friend") present.minh = true
+        if (parsedLine.speakerKey === "huy") present.huy = true
+        if (parsedLine.speakerKey === "ai") present.ai = true
+        if (parsedLine.speakerKey === "company") present.company = true
+      }
+    })
+    // Ensure the main character of the scene is always on stage if defined
+    if (scene.character) {
+      if (scene.character.name === "Minh") present.minh = true
+      if (scene.character.name === "Huy") present.huy = true
+      if (scene.character.name === "AI System") present.ai = true
+      if (scene.character.name === "CEO Nền Tảng") present.company = true
+    }
+    return present
+  }
+
+  const present = getPresentCharacters(scene.dialogue)
 
   const handleChoice = (choice: GameChoice) => {
     if (choice.impact) {
-      setGameState(prev => ({
+      setGameState((prev) => ({
         money: Math.max(0, prev.money + (choice.impact?.money || 0)),
         rating: Math.max(0, Math.min(5, prev.rating + (choice.impact?.rating || 0))),
         kpi: Math.max(0, prev.kpi + (choice.impact?.kpi || 0))
       }))
     }
     setDisplayedDialogue(0)
+    setDisplayedPhoneMessages(0)
     setCurrentScene(choice.nextScene)
   }
 
   const handleContinueDialogue = () => {
-    const scene = scenes[currentScene]
-    
     // If there's a phone screen, show messages progressively
     if (scene.phoneMessages && displayedPhoneMessages < scene.phoneMessages.length) {
-      setDisplayedPhoneMessages(displayedPhoneMessages + 1)
+      setDisplayedPhoneMessages((prev) => prev + 1)
       return
     }
-    
-    // Otherwise, show dialogue progressively
+
+    // Otherwise, show dialogue lines progressively
     if (displayedDialogue < scene.dialogue.length - 1) {
-      setDisplayedDialogue(displayedDialogue + 1)
+      setDisplayedDialogue((prev) => prev + 1)
     } else if (scene.choices && scene.choices.length > 0) {
-      // Already showing choices
+      // Prompt choices
     } else if (scene.isEnding) {
       setGameComplete(true)
     }
@@ -331,65 +450,37 @@ export function GameSection() {
 
   const resetGame = () => {
     setCurrentScene(0)
-      setGameState({ money: 2000000, rating: 5, kpi: 0 })
+    setGameState({ money: 2000000, rating: 5, kpi: 0 })
     setDisplayedDialogue(0)
     setDisplayedPhoneMessages(0)
     setGameComplete(false)
+    setGameStarted(false)
   }
 
   const formatCurrency = (value: number) => {
-    return value.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' }).replace('₫', 'đ')
+    return value.toLocaleString("vi-VN", { style: "currency", currency: "VND" }).replace("₫", "đ")
   }
 
-  const PhoneScreen = ({ messages, displayCount = messages.length }: { messages: PhoneMessage[], displayCount?: number }) => (
-    <div className="bg-black rounded-3xl border-8 border-gray-900 shadow-2xl overflow-hidden max-h-[800px] flex flex-col">
-      {/* Phone Header */}
-      <div className="bg-gray-900 text-white px-4 py-2 flex items-center justify-between text-xs">
-        <span>9:41</span>
-        <span className="font-semibold">NHÓM CHAT TÀI XẾ</span>
-        <span>📶</span>
-      </div>
+  // Handle click on the stage to advance dialog (if not currently choosing)
+  const handleStageClick = (e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest("button") || (e.target as HTMLElement).closest(".choice-container")) {
+      return
+    }
+    const hasChoices = scene.choices && scene.choices.length > 0
+    const isDialogueFinished = displayedDialogue >= scene.dialogue.length - 1
+    const isPhoneFinished = scene.phoneMessages ? displayedPhoneMessages >= scene.phoneMessages.length : true
 
-      {/* Chat Messages */}
-      <div className="flex-1 overflow-y-auto bg-gray-100 p-4 space-y-3">
-        {messages.slice(0, displayCount).map((msg, idx) => (
-          <motion.div
-            key={`msg-${idx}-${msg.sender}`}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="flex gap-2"
-          >
-            <span className="text-2xl flex-shrink-0">{msg.avatar}</span>
-            <div className="flex-1">
-              <div className="text-xs font-bold text-gray-700 mb-1">{msg.sender}</div>
-              <div className={`inline-block max-w-[80%] px-3 py-2 rounded-lg text-sm ${
-                msg.sender === "Huy" 
-                  ? 'bg-blue-500 text-white' 
-                  : 'bg-white text-gray-800 border border-gray-300'
-              }`}>
-                {msg.message}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </div>
+    if (hasChoices && isDialogueFinished && isPhoneFinished) {
+      return
+    }
+    handleContinueDialogue()
+  }
 
-      {/* Phone Input Area */}
-      <div className="bg-gray-200 px-4 py-3 border-t border-gray-300 flex gap-2">
-        <input 
-          type="text" 
-          placeholder="Nhập tin nhắn..."
-          className="flex-1 bg-white rounded-full px-4 py-2 text-sm border-none focus:outline-none"
-          disabled
-        />
-        <button className="text-blue-500 font-bold text-sm">📤</button>
-      </div>
-    </div>
-  )
+  // Check which character is currently active speaker
+  const activeSpeakerKey = parsed.type === "dialogue" ? parsed.speakerKey : ""
 
   return (
-    <section id="section-7" className="min-h-screen py-24 px-4 bg-bg-base relative flex items-center justify-center">
+    <section id="section-8" className="min-h-screen py-24 px-4 bg-bg-base relative flex items-center justify-center">
       <div className="absolute top-0 right-0 text-[20rem] font-serif font-bold text-text-muted opacity-5 select-none leading-none -mt-16 -mr-16">
         08
       </div>
@@ -400,229 +491,489 @@ export function GameSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="mb-12 text-center"
+          className="mb-10 text-center"
         >
           <h2 className="text-4xl font-bold mb-4">Game Nhập Vai: Đối Tác Hay Người Làm Thuê?</h2>
-          <div className="w-24 h-1 bg-accent-red mx-auto mb-8"></div>
-          <p className="text-lg text-text-muted">Trải nghiệm một ngày làm tài xế công nghệ</p>
+          <div className="w-24 h-1 bg-accent-red mx-auto mb-6"></div>
+          <p className="text-lg text-text-muted">Trải nghiệm một ngày làm tài xế công nghệ trong thời đại số</p>
         </motion.div>
 
-        <AnimatePresence mode="wait">
-          {!gameComplete ? (
-            <motion.div
-              key={`scene-${currentScene}-${displayedDialogue}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+        {!gameComplete ? (
+          <div className="flex flex-col gap-6">
+            {/* The Main Stage (Genshin cinematic aspect ratio) */}
+            <div
+              ref={stageRef}
+              onClick={handleStageClick}
+              className="relative w-full aspect-[16/9] bg-gradient-to-b from-[#0f172a] via-[#1e293b] to-[#0f172a] rounded-2xl overflow-hidden shadow-2xl border-4 border-[#e0d9d0] cursor-pointer group select-none flex flex-col justify-between p-6"
             >
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Main Game Area */}
-                <div className="lg:col-span-2">
-                  <Card className="bg-bg-base border-2 border-[#e0d9d0] shadow-md">
-                    <CardContent className="p-8">
-                      {/* Scene Title */}
-                      <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-accent-red mb-4">{scene.title}</h3>
-                        {scene.character && !scene.phoneMessages && (
-                          <div className="flex items-center gap-3 mb-6 p-3 bg-gray-50 rounded-lg">
-                            <span className="text-4xl">{scene.character.avatar}</span>
-                            <div>
-                              <div className="font-bold">{scene.character.name}</div>
-                              <div className="text-sm text-gray-600">{scene.character.role}</div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
+              {/* Cinematic Background Video */}
+              <video
+                src="/hinh_nen.mp4"
+                autoPlay
+                loop
+                muted
+                playsInline
+                className={`absolute inset-0 w-full h-full object-cover object-center pointer-events-none select-none z-0 filter brightness-[0.70] contrast-[1.05] transition-all duration-700 ${scene.phoneMessages ? "opacity-0 pointer-events-none" : "opacity-100"
+                  }`}
+              />
 
-                      {/* Phone Screen - if available */}
-                      {scene.phoneMessages && (
-                        <div className="mb-6 flex justify-center">
-                          <PhoneScreen messages={scene.phoneMessages} />
-                        </div>
-                      )}
+              {/* Game Grid Overlay */}
+              <div className={`absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.015)_50%,rgba(0,0,0,0.015)_50%)] bg-[length:100%_4px] pointer-events-none z-25 opacity-60 transition-opacity duration-700 ${scene.phoneMessages ? "opacity-0" : "opacity-100"
+                }`} />
 
-                      {/* Dialogue Display */}
-                      <div className="space-y-3 mb-8 min-h-[300px]">
-                        {scene.dialogue.slice(0, displayedDialogue + 1).map((line, idx) => (
-                          <motion.div
-                            key={`dialogue-${scene.id}-${idx}`}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            className={`p-3 rounded-lg ${
-                              line.startsWith('💰') || line.startsWith('⭐') || line.startsWith('📊')
-                                ? 'bg-yellow-50 text-yellow-900 font-semibold'
-                                : line.startsWith('🤖')
-                                ? 'bg-blue-50 text-blue-900 border-l-4 border-blue-400'
-                                : line.startsWith('💼')
-                                ? 'bg-purple-50 text-purple-900 border-l-4 border-purple-400'
-                                : line.startsWith('❌') || line.startsWith('✅')
-                                ? 'bg-red-50 text-red-900 font-bold text-lg'
-                                : line.startsWith('💔')
-                                ? 'bg-red-100 text-red-900 font-bold'
-                                : line.startsWith('[') && line.endsWith(']')
-                                ? 'bg-gray-100 text-gray-700 italic'
-                                : line.startsWith('📧') || line.startsWith('📱') || line.startsWith('📰') || line.startsWith('📊')
-                                ? 'bg-indigo-50 text-indigo-900 font-semibold'
-                                : 'bg-white border'
-                            }`}
-                          >
-                            {line}
-                          </motion.div>
-                        ))}
-                      </div>
+              {!gameStarted ? (
+                /* START SCREEN MENU */
+                <div className="absolute inset-0 z-30 flex flex-col items-center justify-center text-center p-8 bg-black/45 backdrop-blur-[2px] pointer-events-auto cursor-default animate-fade-in">
+                  <motion.div
+                    initial={{ opacity: 0, y: -30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8 }}
+                    className="max-w-2xl flex flex-col items-center justify-center"
+                  >
+                    <span className="text-[10px] text-accent-gold font-bold tracking-widest font-mono border border-accent-gold/40 px-3.5 py-1 rounded-full bg-black/60 backdrop-blur-md shadow-lg uppercase mb-5 inline-block select-none">
+                      Dự Án Học Tập Nghiên Cứu Lênin
+                    </span>
 
-                      {/* Continue Button or Choices */}
-                      {displayedDialogue < scene.dialogue.length - 1 ? (
-                        <Button
-                          onClick={handleContinueDialogue}
-                          className="w-full bg-accent-red hover:bg-red-700 text-white"
-                        >
-                          Tiếp tục <ChevronRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      ) : scene.choices && scene.choices.length > 0 ? (
-                        <div className="space-y-3">
-                          {scene.choices.map((choice, idx) => (
-                            <motion.button
-                              key={`choice-${scene.id}-${idx}`}
-                              whileHover={{ scale: 1.02 }}
-                              whileTap={{ scale: 0.98 }}
-                              onClick={() => handleChoice(choice)}
-                              className="w-full text-left p-4 border-2 border-gray-300 rounded-lg hover:border-accent-red hover:bg-gray-50 transition-all"
-                            >
-                              <div className="flex items-center justify-between">
-                                <span className="font-medium">{choice.text}</span>
-                                <ChevronRight className="w-5 h-5 text-gray-400" />
-                              </div>
-                            </motion.button>
-                          ))}
-                        </div>
-                      ) : scene.isEnding ? (
-                        <Button
-                          onClick={() => setGameComplete(true)}
-                          className="w-full bg-accent-red hover:bg-red-700 text-white"
-                        >
-                          Xem tóm tắt <ChevronRight className="w-4 h-4 ml-2" />
-                        </Button>
-                      ) : null}
-                    </CardContent>
-                  </Card>
-                </div>
-
-                {/* Stats Sidebar */}
-                <div className="space-y-4">
-                  <Card className="bg-yellow-50 border-2 border-yellow-200">
-                    <CardContent className="p-6">
-                      <div className="text-sm text-gray-600 mb-1">Lương hiện tại</div>
-                      <div className="text-2xl font-bold text-yellow-700">{formatCurrency(gameState.money)}</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-blue-50 border-2 border-blue-200">
-                    <CardContent className="p-6">
-                      <div className="text-sm text-gray-600 mb-1">Đánh giá</div>
-                      <div className="text-2xl font-bold text-blue-700">⭐ {gameState.rating.toFixed(1)}</div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-red-50 border-2 border-red-200">
-                    <CardContent className="p-6">
-                      <div className="text-sm text-gray-600 mb-1">Áp lực KPI</div>
-                      <div className="text-2xl font-bold text-red-700">{gameState.kpi}</div>
-                      <div className="mt-2 h-2 bg-gray-300 rounded-full overflow-hidden">
-                        <div
-                          className="h-full bg-red-600 transition-all"
-                          style={{ width: `${Math.min(gameState.kpi, 100)}%` }}
-                        />
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-purple-50 border-2 border-purple-200">
-                    <CardContent className="p-6">
-                      <div className="text-sm text-gray-600 mb-1">Tiến độ</div>
-                      <div className="text-2xl font-bold text-purple-700">{currentScene + 1}/{scenes.length}</div>
-                      <div className="mt-2 space-y-1">
-                        {new Array(scenes.length).fill(null).map((_, i) => (
-                          <div key={`progress-${i}`} className="text-xs">
-                            {i < currentScene ? '✅' : i === currentScene ? '▶️' : '⬜'} {scenes[i].title.split('—')[0].trim()}
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.95 }}
-            >
-              <Card className="bg-bg-base border-2 border-[#e0d9d0] shadow-md">
-                <CardContent className="p-12">
-                  <div className="text-center">
-                    <div className="text-6xl mb-6">
-                      {scenes[currentScene].endingType === 'good' ? '✅' : '❌'}
-                    </div>
-
-                    <h3 className={`text-3xl font-bold mb-4 ${
-                      scenes[currentScene].endingType === 'good' 
-                        ? 'text-green-600' 
-                        : 'text-red-600'
-                    }`}>
-                      {scenes[currentScene].endingType === 'good' 
-                        ? '✅ CHIẾN THẮNG - Người lao động có tiếng nói'
-                        : '❌ THẤT BẠI - Bị kiểm soát bởi hệ thống'}
+                    <h3 className="text-4xl md:text-5xl font-extrabold font-serif text-[#FAF6EE] tracking-wide mb-4 drop-shadow-[0_4px_12px_rgba(0,0,0,0.85)] select-none leading-tight">
+                      ĐỐI TÁC HAY <br />
+                      <span className="bg-clip-text text-transparent bg-gradient-to-r from-accent-red to-accent-gold drop-shadow-[0_2px_4px_rgba(0,0,0,0.6)]">
+                        NGƯỜI LÀM THUÊ?
+                      </span>
                     </h3>
 
-                    <div className="max-w-2xl mx-auto bg-gray-50 p-8 rounded-lg mb-8">
-                      <p className="text-lg text-text-muted leading-relaxed mb-6">
-                        {scenes[currentScene].endingType === 'good'
-                          ? 'Khi người lao động đoàn kết và hành động tập thể, họ có sức mạnh để bảo vệ quyền lợi của mình. Cuộc đấu tranh không phải chống lại công ty, mà là đòi sự công bằng.'
-                          : 'Một cá nhân khó có thể chống lại hệ thống. Nhưng nếu biết cách tổ chức, tập hợp sức mạnh của hàng trăm hay hàng nghìn người lao động, bạn sẽ có tiếng nói.'}
+                    <p className="text-xs md:text-sm text-slate-300 font-serif italic mb-8 max-w-lg mx-auto leading-relaxed drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] select-none">
+                      Nhập vai Minh - một cử nhân vừa tốt nghiệp lựa chọn chạy xe công nghệ kiếm sống. Trải nghiệm áp lực đánh giá từ khách hàng và quyền lực vô hình của thuật toán giám sát platform toàn trị...
+                    </p>
+
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setGameStarted(true)}
+                      className="px-8 py-4.5 bg-gradient-to-r from-accent-red to-red-800 hover:from-accent-red hover:to-accent-red text-[#FAF6EE] font-bold font-serif text-base rounded-xl border border-red-500/20 shadow-2xl transition-all cursor-pointer flex items-center justify-center gap-2.5 mx-auto hover:shadow-red-950/40"
+                    >
+                      <span>BẮT ĐẦU HÀNH TRÌNH</span>
+                      <ChevronRight className="w-5 h-5 animate-bounce-horizontal" />
+                    </motion.button>
+                  </motion.div>
+
+                  {/* Fullscreen Button on Start Menu */}
+                  <div className="absolute top-6 right-6 pointer-events-auto">
+                    <button
+                      onClick={toggleFullscreen}
+                      className="flex items-center justify-center p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 hover:bg-black/80 hover:border-accent-gold/40 text-[#FAF6EE] transition-all hover:scale-105 cursor-pointer"
+                      title={isFullscreen ? "Thoát toàn màn hình" : "Bật toàn màn hình"}
+                    >
+                      {isFullscreen ? <Minimize2 className="w-4 h-4 text-accent-gold" /> : <Maximize2 className="w-4 h-4 text-accent-gold" />}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* ACTIVE RPG GAMEPLAY */
+                <>
+
+              {/* HUD / Top Bar */}
+              <div className="flex items-center justify-between w-full z-30 pointer-events-none">
+                {/* Title and Progress */}
+                <div className="flex flex-col gap-1 bg-black/60 backdrop-blur-md px-4 py-2 rounded-xl border border-white/10 shadow-lg">
+                  <span className="text-[10px] text-accent-gold font-bold tracking-widest font-mono">
+                    {scene.title}
+                  </span>
+                  <span className="text-xs text-white/80 font-medium font-sans">
+                    Tiến độ: {currentScene + 1}/{scenes.length}
+                  </span>
+                </div>
+
+                {/* RPG Stats Overlay */}
+                <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
+                    <Wallet className="w-4 h-4 text-yellow-500 animate-pulse" />
+                    <span className="text-xs font-bold text-yellow-400 font-mono">
+                      {formatCurrency(gameState.money)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
+                    <Star className="w-4 h-4 text-blue-400 fill-blue-400" />
+                    <span className="text-xs font-bold text-blue-300 font-mono">
+                      ⭐ {gameState.rating.toFixed(1)}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 bg-black/60 backdrop-blur-md px-3.5 py-2 rounded-xl border border-white/10 shadow-lg">
+                    <Flame className="w-4 h-4 text-red-500" />
+                    <span className="text-xs font-bold text-red-400 font-mono">
+                      KPI: {gameState.kpi}
+                    </span>
+                  </div>
+
+                  {/* Fullscreen Button */}
+                  <button
+                    onClick={toggleFullscreen}
+                    className="flex items-center justify-center p-2 rounded-xl bg-black/60 backdrop-blur-md border border-white/10 hover:bg-black/80 hover:border-accent-gold/40 text-[#FAF6EE] transition-all hover:scale-105 pointer-events-auto cursor-pointer"
+                    title={isFullscreen ? "Thoát toàn màn hình" : "Bật toàn màn hình"}
+                  >
+                    {isFullscreen ? <Minimize2 className="w-4 h-4 text-accent-gold" /> : <Maximize2 className="w-4 h-4 text-accent-gold" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* RPG Character Sprites Layer */}
+              {!scene.phoneMessages && (
+                <div className="absolute inset-x-0 bottom-0 top-16 flex items-end justify-between px-12 pointer-events-none z-10 overflow-hidden">
+                  {/* MINH (Left) */}
+                  <motion.div
+                    animate={{
+                      opacity: present.minh ? (activeSpeakerKey === "minh" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
+                      scale: present.minh ? (activeSpeakerKey === "minh" ? 1.55 : 1.35) : 0.8,
+                      x: present.minh ? 25 : -100,
+                      filter: activeSpeakerKey === "minh" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
+                    }}
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                    className="relative w-[32%] h-[100%] flex items-end justify-center origin-bottom shrink-0"
+                  >
+                    <img
+                      src="/characters/minh.png"
+                      alt="Minh"
+                      className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                    />
+                  </motion.div>
+
+                  {/* CEO (Center-Left) */}
+                  <motion.div
+                    animate={{
+                      opacity: present.company ? (activeSpeakerKey === "company" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
+                      scale: present.company ? (activeSpeakerKey === "company" ? 1.55 : 1.35) : 0.8,
+                      x: present.company ? 15 : -50,
+                      filter: activeSpeakerKey === "company" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
+                    }}
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                    className="relative w-[32%] h-[100%] flex items-end justify-center origin-bottom shrink-0"
+                  >
+                    <img
+                      src="/characters/ceo.png"
+                      alt="CEO"
+                      className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                    />
+                  </motion.div>
+
+                  {/* AI System (Center-Right) */}
+                  <motion.div
+                    animate={{
+                      opacity: present.ai ? (activeSpeakerKey === "ai" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
+                      scale: present.ai ? (activeSpeakerKey === "ai" ? 1.6 : 1.38) : 0.8,
+                      y: present.ai ? (activeSpeakerKey === "ai" ? -8 : 0) : 100,
+                      x: present.ai ? -15 : 50,
+                      filter: activeSpeakerKey === "ai" ? "brightness(1.1)" : "brightness(0.55)"
+                    }}
+                    transition={{ type: "spring", stiffness: 100, damping: 20 }}
+                    className="relative w-[32%] h-[100%] flex items-end justify-center origin-bottom shrink-0"
+                  >
+                    <img
+                      src="/characters/ai.png"
+                      alt="AI System"
+                      className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                    />
+                  </motion.div>
+
+                  {/* HUY (Right) */}
+                  <motion.div
+                    animate={{
+                      opacity: present.huy ? (activeSpeakerKey === "huy" || parsed.type === "action" || parsed.type === "narrative" ? 1 : 0.45) : 0,
+                      scale: present.huy ? (activeSpeakerKey === "huy" ? 1.55 : 1.35) : 0.8,
+                      x: present.huy ? -25 : 100,
+                      filter: activeSpeakerKey === "huy" || parsed.type === "action" || parsed.type === "narrative" ? "brightness(1.05) contrast(1.05)" : "brightness(0.55)"
+                    }}
+                    transition={{ type: "spring", stiffness: 120, damping: 20 }}
+                    className="relative w-[32%] h-[100%] flex items-end justify-center origin-bottom shrink-0"
+                  >
+                    <img
+                      src="/characters/huy.png"
+                      alt="Huy"
+                      className="h-full object-contain object-bottom drop-shadow-[0_12px_24px_rgba(0,0,0,0.65)]"
+                    />
+                  </motion.div>
+                </div>
+              )}
+
+              {/* Group Chat Screen Mode (If present in Scene) */}
+              {scene.phoneMessages && (
+                <div className="absolute inset-0 flex items-center justify-center z-15 p-4 bg-black/40 backdrop-blur-sm">
+                  <div className="w-[340px] h-[90%] bg-black rounded-[36px] border-[6px] border-slate-700 shadow-2xl overflow-hidden flex flex-col pointer-events-auto">
+                    {/* Header */}
+                    <div className="bg-slate-900 text-white px-5 py-2.5 flex items-center justify-between text-[11px] font-medium font-mono border-b border-slate-800">
+                      <span>9:41</span>
+                      <span className="text-accent-gold font-bold">💬 NHÓM TÀI XẾ</span>
+                      <span>📶 🔋</span>
+                    </div>
+
+                    {/* Messages Body */}
+                    <div ref={chatContainerRef} className="flex-1 overflow-y-auto bg-slate-950 p-4 space-y-3 scrollbar-thin">
+                      {scene.phoneMessages.slice(0, displayedPhoneMessages).map((msg, idx) => (
+                        <motion.div
+                          key={`msg-${idx}-${msg.sender}`}
+                          initial={{ opacity: 0, y: 15 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="flex gap-2"
+                        >
+                          <span className="text-xl flex-shrink-0 bg-slate-800 w-8 h-8 rounded-full flex items-center justify-center shadow">
+                            {msg.avatar}
+                          </span>
+                          <div className="flex-1">
+                            <div className="text-[10px] font-bold text-slate-400 mb-0.5">{msg.sender}</div>
+                            <div className={`inline-block max-w-[85%] px-3.5 py-2 rounded-2xl text-xs leading-relaxed shadow-sm ${msg.sender === "Huy"
+                              ? "bg-accent-red text-white"
+                              : "bg-slate-800 text-slate-100 border border-slate-700"
+                              }`}>
+                              {msg.message}
+                            </div>
+                          </div>
+                        </motion.div>
+                      ))}
+                    </div>
+
+                    {/* Footer Input Area */}
+                    <div className="bg-slate-900 px-4 py-3.5 border-t border-slate-800 flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Nhập ý kiến của bạn..."
+                        className="flex-1 bg-slate-950 text-slate-400 rounded-full px-4 py-2 text-xs border border-slate-800 focus:outline-none"
+                        disabled
+                      />
+                      <button className="text-accent-gold text-sm hover:scale-105 transition-transform">📤</button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* COMIC SPEECH BUBBLE LAYER */}
+              <div className="absolute inset-x-6 bottom-4 z-20 pointer-events-none flex flex-col items-center">
+                {/* 1. Cinematic System Narration/Action Line */}
+                {parsed.type === "action" && (
+                  <motion.div
+                    key={`narration-${displayedDialogue}`}
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    className="w-full max-w-2xl bg-black/75 border border-[#b8860b]/30 shadow-2xl rounded-xl p-5 text-center text-white backdrop-blur-md"
+                  >
+                    <p className="text-sm font-serif italic tracking-wide text-amber-200">
+                      {parsed.text}
+                    </p>
+                  </motion.div>
+                )}
+
+                {/* 2. Character Speech Bubble */}
+                {parsed.type === "dialogue" && !scene.phoneMessages && (
+                  <motion.div
+                    key={`speech-${currentScene}-${displayedDialogue}`}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -15 }}
+                    transition={{ type: "spring", stiffness: 150, damping: 18 }}
+                    className={`w-full max-w-2xl ${activeSpeakerKey === "minh"
+                      ? "self-start pl-8"
+                      : activeSpeakerKey === "huy"
+                        ? "self-end pr-8"
+                        : "self-center"
+                      }`}
+                  >
+                    <div className={`relative p-5 rounded-2xl shadow-2xl border-2 z-30 ${activeSpeakerKey === "ai"
+                      ? "bg-cyan-950/95 border-cyan-500/50 text-cyan-50 text-center"
+                      : "bg-[#FAF6EE] border-[#b8860b]/40 text-[#1a1410]"
+                      }`}>
+                      {/* Speaker Badge */}
+                      <div className={`absolute -top-3.5 px-4 py-0.5 text-[11px] font-bold rounded-full font-serif shadow border ${activeSpeakerKey === "ai"
+                        ? "left-1/2 -translate-x-1/2 bg-cyan-600 border-cyan-400 text-white"
+                        : activeSpeakerKey === "minh"
+                          ? "left-6 bg-accent-gold border-amber-300 text-[#FAF6EE]"
+                          : "right-6 bg-accent-red border-red-400 text-[#FAF6EE]"
+                        }`}>
+                        {parsed.speaker}
+                      </div>
+
+                      {/* Dialog Text */}
+                      <p className="text-sm font-medium leading-relaxed mt-1 font-serif">
+                        {parsed.text}
                       </p>
 
-                      <div className="bg-white p-4 rounded border-l-4 border-accent-red">
-                        <p className="font-bold mb-2">Bài học từ game:</p>
-                        <ul className="text-left space-y-1 text-text-muted">
-                          <li>• "Đối tác tự do" không có quyền thương lượng = Nhân viên</li>
-                          <li>• Thuật toán điều khiển, con người phục vụ</li>
-                          <li>• Quyền lợi bảo vệ bằng đấu tranh tập thể</li>
-                          <li>• Biết "không làm" cũng là một sức mạnh</li>
-                        </ul>
-                      </div>
+                      {/* Custom Comics Bubble Arrow Tail */}
+                      {activeSpeakerKey !== "ai" && (
+                        <div className={`absolute w-3.5 h-3.5 rotate-45 border-r border-b ${activeSpeakerKey === "minh"
+                          ? "-bottom-[8px] left-10 bg-[#FAF6EE] border-[#b8860b]/30"
+                          : "-bottom-[8px] right-10 bg-[#FAF6EE] border-[#b8860b]/30"
+                          }`} />
+                      )}
+                    </div>
+                  </motion.div>
+                )}
+
+                {/* 3. Pure Narrative Text (Simple captions) */}
+                {parsed.type === "narrative" && (
+                  <motion.div
+                    key={`narrative-${displayedDialogue}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0 }}
+                    className="w-full max-w-xl bg-[#FAF6EE]/90 border border-slate-200 shadow-xl rounded-xl p-4 text-center text-slate-800 backdrop-blur"
+                  >
+                    <p className="text-sm font-serif font-medium">
+                      {parsed.text}
+                    </p>
+                  </motion.div>
+                )}
+
+                {/* Click to Continue Pulsating Arrow */}
+                {!(scene.choices && scene.choices.length > 0 && displayedDialogue >= scene.dialogue.length - 1) && (
+                  <div className="absolute right-4 bottom-2 text-white/50 text-[10px] flex items-center gap-1 font-mono tracking-widest animate-pulse pointer-events-none select-none">
+                    CLICK STAGE TO CONTINUE
+                    <ChevronRight className="w-3.5 h-3.5 animate-bounce-horizontal" />
+                  </div>
+                )}
+              </div>
+
+              {/* Genshin styled Floating Dialogue Choices */}
+              {displayedDialogue >= scene.dialogue.length - 1 &&
+                (!scene.phoneMessages || displayedPhoneMessages >= scene.phoneMessages.length) &&
+                scene.choices && scene.choices.length > 0 && (
+                  <div className="absolute right-6 top-1/2 -translate-y-1/2 w-80 flex flex-col gap-3.5 z-40 choice-container pointer-events-auto">
+                    {scene.choices.map((choice, idx) => (
+                      <motion.button
+                        key={`choice-${scene.id}-${idx}`}
+                        initial={{ opacity: 0, x: 30 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.15, type: "spring", stiffness: 120 }}
+                        whileHover={{ scale: 1.03, x: 5 }}
+                        whileTap={{ scale: 0.97 }}
+                        onClick={() => handleChoice(choice)}
+                        className="w-full text-left p-4 bg-black/85 backdrop-blur-md border border-[#b8860b]/40 text-[#FAF6EE] rounded-xl hover:border-accent-red hover:bg-[#1a1410] shadow-lg transition-all flex items-center justify-between group pointer-events-auto"
+                      >
+                        <span className="text-xs font-serif font-semibold pr-2 leading-relaxed">
+                          {choice.text}
+                        </span>
+                        <ChevronRight className="w-4 h-4 text-accent-gold group-hover:text-accent-red transition-colors shrink-0" />
+                      </motion.button>
+                    ))}
+                  </div>
+                )}
+                  </>
+                )}
+            </div>
+
+            {/* Quick Helper hint */}
+            <div className="text-center text-xs text-text-muted italic flex items-center justify-center gap-2 mt-2">
+              <span>💡 Bạn có thể click trực tiếp vào khung game để tiếp tục cuộc trò chuyện!</span>
+            </div>
+          </div>
+        ) : (
+          /* High-Fidelity Ending / Game Complete Stage Screen */
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="w-full animate-fade-in"
+          >
+            <Card className="bg-[#FAF6EE] border-4 border-[#b8860b] shadow-2xl overflow-hidden rounded-2xl">
+              <CardContent className="p-0">
+                {/* Header graphic banner */}
+                <div className={`p-8 text-center text-white flex flex-col items-center justify-center gap-2 ${scenes[currentScene].endingType === "good"
+                  ? "bg-gradient-to-r from-emerald-800 to-teal-900 border-b-4 border-emerald-950"
+                  : "bg-gradient-to-r from-red-800 to-rose-950 border-b-4 border-red-950"
+                  }`}>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 180, damping: 15 }}
+                    className="text-6xl mb-2"
+                  >
+                    {scenes[currentScene].endingType === "good" ? "🏆" : "💀"}
+                  </motion.div>
+
+                  <h3 className="text-3xl font-bold font-serif uppercase tracking-widest text-[#FAF6EE]">
+                    {scenes[currentScene].endingType === "good"
+                      ? "Kết Thúc Viên Mãn"
+                      : "Kết Thúc Bị Hạn Chế"}
+                  </h3>
+
+                  <p className="text-sm font-serif font-medium tracking-wide text-[#FAF6EE]/80">
+                    {scenes[currentScene].endingType === "good"
+                      ? "✅ Đấu tranh tập thể giành chiến thắng!"
+                      : "❌ Bị cô lập và bị kiểm soát bởi hệ thống"}
+                  </p>
+                </div>
+
+                <div className="p-8 max-w-3xl mx-auto space-y-8">
+                  {/* Explanation text */}
+                  <div className="bg-bg-muted/40 p-6 rounded-xl border border-[#e0d9d0] shadow-inner text-center">
+                    <p className="text-base font-serif italic text-text-ink leading-relaxed font-medium">
+                      {scenes[currentScene].endingType === "good"
+                        ? "Khi người lao động đoàn kết và hành động tập thể, họ có sức mạnh để bảo vệ quyền lợi của mình. Cuộc đấu tranh không phải chống lại tiến bộ công nghệ, mà là đòi sự công bằng trong kinh tế số."
+                        : "Một cá nhân lao động đơn lẻ hoàn toàn bất lực trước quyền lực của thuật toán nền tảng. Khi bạn chọn một mình chịu đựng hoặc làm việc biệt lập, bạn hoàn toàn nằm dưới sự kiểm soát một chiều."}
+                    </p>
+                  </div>
+
+                  {/* Core Lessons from the story */}
+                  <div className="border border-[#b8860b]/30 rounded-xl overflow-hidden bg-[#FAF6EE] shadow-sm">
+                    <div className="bg-[#b8860b]/10 px-5 py-3 border-b border-[#b8860b]/20 flex items-center gap-2">
+                      <Landmark className="w-5 h-5 text-accent-gold" />
+                      <span className="font-bold text-sm text-[#1a1410] font-serif uppercase tracking-wider">
+                        Bài Học Ý Thức Hệ
+                      </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-4 mb-8">
-                      <div className="p-4 bg-yellow-50 rounded-lg">
-                        <div className="text-2xl font-bold text-yellow-600">{formatCurrency(gameState.money)}</div>
-                        <div className="text-xs text-gray-600 mt-1">Thu nhập cuối cùng</div>
-                      </div>
-                      <div className="p-4 bg-blue-50 rounded-lg">
-                        <div className="text-2xl font-bold text-blue-600">⭐ {gameState.rating.toFixed(1)}</div>
-                        <div className="text-xs text-gray-600 mt-1">Đánh giá cuối</div>
-                      </div>
-                      <div className="p-4 bg-red-50 rounded-lg">
-                        <div className="text-2xl font-bold text-red-600">{gameState.kpi}</div>
-                        <div className="text-xs text-gray-600 mt-1">Áp lực KPI</div>
-                      </div>
+                    <ul className="p-5 space-y-3.5 text-sm text-text-muted">
+                      <li className="flex items-start gap-3">
+                        <span className="text-accent-red font-bold font-mono">1.</span>
+                        <span>
+                          <strong>"Đối tác tự do" chỉ là danh nghĩa:</strong> Không có quyền tự thương lượng, tự quản hay kiểm soát giá cước của mình thì thực chất tài xế vẫn chỉ là người bán sức lao động kiếm sống.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-accent-red font-bold font-mono">2.</span>
+                        <span>
+                          <strong>Sự thống trị của thuật toán:</strong> Trí tuệ nhân tạo (AI) đã trở thành công cụ quản lý nhân sự kiểu mới – ẩn mình, toàn trị và không thể thương thảo trực tiếp.
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <span className="text-accent-red font-bold font-mono">3.</span>
+                        <span>
+                          <strong>Quyền lực tập thể:</strong> Giai cấp công nhân và lao động tự do công nghệ chỉ có thể tìm thấy sự cân bằng và bảo vệ quyền lợi thông qua sự đoàn kết và tập hợp tổ chức.
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+
+                  {/* Final Stats */}
+                  <div className="grid grid-cols-3 gap-4">
+                    <div className="p-4 bg-yellow-500/10 border border-yellow-500/20 rounded-xl text-center shadow-sm">
+                      <div className="text-sm font-semibold text-text-muted font-serif mb-1">Thu nhập cuối</div>
+                      <div className="text-xl font-bold text-yellow-700 font-mono">{formatCurrency(gameState.money)}</div>
                     </div>
 
+                    <div className="p-4 bg-blue-500/10 border border-blue-500/20 rounded-xl text-center shadow-sm">
+                      <div className="text-sm font-semibold text-text-muted font-serif mb-1">Đánh giá sao</div>
+                      <div className="text-xl font-bold text-blue-700 font-mono">⭐ {gameState.rating.toFixed(1)}</div>
+                    </div>
+
+                    <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-center shadow-sm">
+                      <div className="text-sm font-semibold text-text-muted font-serif mb-1">Áp lực KPI</div>
+                      <div className="text-xl font-bold text-red-700 font-mono">{gameState.kpi}</div>
+                    </div>
+                  </div>
+
+                  {/* Replay action */}
+                  <div className="flex justify-center pt-2">
                     <Button
                       onClick={resetGame}
-                      className="gap-2 bg-accent-red hover:bg-red-700"
+                      className="gap-2.5 bg-accent-red hover:bg-red-800 text-[#FAF6EE] px-8 py-6 rounded-xl font-serif font-bold text-base shadow-lg transition-transform hover:scale-105 active:scale-95"
                     >
-                      <RotateCcw className="w-4 h-4" />
-                      Chơi lại
+                      <RotateCcw className="w-5 h-5 animate-spin-slow" />
+                      Trải nghiệm lại câu chuyện
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        )}
       </div>
     </section>
   )

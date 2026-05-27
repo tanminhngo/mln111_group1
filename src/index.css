@@ -12,6 +12,18 @@
   --color-text-ink: #1a1410;
   --color-text-muted: #6b6560;
   --color-border: #e0d9d0;
+
+  --animate-spin-slow: spin 8s linear infinite;
+  --animate-bounce-horizontal: bounce-horizontal 1s ease-in-out infinite;
+
+  @keyframes bounce-horizontal {
+    0%, 100% {
+      transform: translateX(0);
+    }
+    50% {
+      transform: translateX(4px);
+    }
+  }
 }
 
 @layer base {
