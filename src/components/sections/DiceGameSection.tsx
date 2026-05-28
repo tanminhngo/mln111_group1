@@ -19,43 +19,43 @@ const DICE_QUESTIONS: BoardQuestion[] = [
   {
     id: 1,
     question: "Tập đoàn người có địa vị kinh tế - xã hội khác nhau trong một hệ thống sản xuất xã hội nhất định được gọi là gì?",
-    options: ["Giai cấp", "Dân tộc", "Tầng lớp", "Nghiệp đoàn"],
-    answer: 0,
+    options: ["Tầng lớp", "Dân tộc", "Giai cấp", "Nghiệp đoàn"],
+    answer: 2,
     explanation: "Định nghĩa kinh điển của V.I. Lênin nêu rõ giai cấp là những tập đoàn người to lớn có địa vị khác nhau trong một hệ thống sản xuất lịch sử nhất định."
   },
   {
     id: 2,
     question: "Điểm mấu chốt quyết định sự khác biệt giữa các giai cấp theo Lênin là gì?",
-    options: ["Mức thu nhập hàng tháng", "Trình độ học vấn chính quy", "Quan hệ đối với tư liệu sản xuất", "Địa bàn sinh sống"],
-    answer: 2,
+    options: ["Quan hệ đối với tư liệu sản xuất", "Mức thu nhập hàng tháng", "Địa bàn sinh sống", "Trình độ học vấn chính quy"],
+    answer: 0,
     explanation: "Quan hệ sở hữu tư liệu sản xuất là tiêu chí cốt lõi, quyết định địa vị thống trị hay bị trị và cách thức phân phối hưởng thụ của cải."
   },
   {
     id: 3,
     question: "Giai cấp nào nắm quyền sở hữu tư liệu sản xuất chủ yếu và thống trị trong xã hội tư bản?",
-    options: ["Giai cấp vô sản", "Giai cấp tư sản", "Tầng lớp trung lưu", "Giai cấp nông dân"],
+    options: ["Tầng lớp trung lưu", "Giai cấp tư sản", "Giai cấp vô sản", "Giai cấp nông dân"],
     answer: 1,
     explanation: "Giai cấp tư sản là giai cấp chiếm hữu tư bản và tư liệu sản xuất chủ yếu của xã hội, bóc lột lao động làm thuê."
   },
   {
     id: 4,
     question: "Giai cấp vô sản phải bán thứ gì để duy trì sự sống dưới chế độ tư bản chủ nghĩa?",
-    options: ["Tư liệu tiêu dùng cá nhân", "Sức lao động", "Tư liệu sản xuất cá thể", "Quyền công dân chính trị"],
-    answer: 1,
+    options: ["Tư liệu tiêu dùng cá nhân", "Tư liệu sản xuất cá thể", "Quyền công dân chính trị", "Sức lao động"],
+    answer: 3,
     explanation: "Vì không có tư liệu sản xuất, giai cấp vô sản buộc phải bán sức lao động của mình cho nhà tư bản để đổi lấy tiền lương sống qua ngày."
   },
   {
     id: 5,
     question: "Nguyên nhân trực tiếp, sâu xa dẫn đến sự xuất hiện của các giai cấp trong lịch sử là gì?",
-    options: ["Chiến tranh giữa các bộ tộc", "Sự xuất hiện chế độ tư hữu về tư liệu sản xuất", "Sự phân chia lại lãnh thổ quốc gia", "Sự xuất hiện của chữ viết và tôn giáo"],
-    answer: 1,
+    options: ["Sự xuất hiện chế độ tư hữu về tư liệu sản xuất", "Chiến tranh giữa các bộ tộc", "Sự phân chia lại lãnh thổ quốc gia", "Sự xuất hiện của chữ viết và tôn giáo"],
+    answer: 0,
     explanation: "Chế độ tư hữu xuất hiện khi lực lượng sản xuất phát triển tạo ra sản phẩm thặng dư, dẫn đến phân hóa giai cấp giàu nghèo, bóc lột."
   },
   {
     id: 6,
     question: "Lực lượng nào được coi là động lực phát triển xã hội trong các xã hội có đối kháng giai cấp?",
-    options: ["Tiến bộ kỹ thuật công nghệ", "Đấu tranh giai cấp", "Tự do thương mại toàn cầu", "Ý chí của các vĩ nhân lịch sử"],
-    answer: 1,
+    options: ["Tiến bộ kỹ thuật công nghệ", "Tự do thương mại toàn cầu", "Đấu tranh giai cấp", "Ý chí của các vĩ nhân lịch sử"],
+    answer: 2,
     explanation: "Theo quan điểm chủ nghĩa Mác - Lênin, đấu tranh giai cấp là động lực trực tiếp thúc đẩy sự phát triển của lịch sử có đối kháng giai cấp."
   },
   {
@@ -75,8 +75,8 @@ const DICE_QUESTIONS: BoardQuestion[] = [
   {
     id: 9,
     question: "Hình thức đấu tranh đầu tiên, sơ khai nhất của giai cấp công nhân chống tư sản là hình thức nào?",
-    options: ["Đấu tranh tư tưởng", "Đấu tranh kinh tế", "Đấu tranh chính trị", "Đấu tranh ngoại giao"],
-    answer: 1,
+    options: ["Đấu tranh tư tưởng", "Đấu tranh chính trị", "Đấu tranh ngoại giao", "Đấu tranh kinh tế"],
+    answer: 3,
     explanation: "Đấu tranh kinh tế (như đòi tăng lương, giảm giờ làm) xuất hiện sớm nhất khi công nhân chưa có ý thức giai cấp tự giác, chỉ đấu tranh tự phát."
   },
   {
@@ -96,29 +96,29 @@ const DICE_QUESTIONS: BoardQuestion[] = [
   {
     id: 12,
     question: "Đình công bãi công của công nhân chống giới chủ đòi tăng lương thuộc hình thức đấu tranh nào?",
-    options: ["Đấu tranh tư tưởng", "Đấu tranh kinh tế", "Đấu tranh chính trị", "Đấu tranh vũ trang"],
-    answer: 1,
+    options: ["Đấu tranh kinh tế", "Đấu tranh tư tưởng", "Đấu tranh chính trị", "Đấu tranh vũ trang"],
+    answer: 0,
     explanation: "Đây là hình thức đấu tranh kinh tế, bảo vệ quyền lợi vật chất hằng ngày của người bán sức lao động trước sự chèn ép của giới chủ."
   },
   {
     id: 13,
     question: "Liên minh cách mạng bền vững nhất mang tính quyết định thắng lợi đấu tranh thuộc về các giai cấp nào?",
-    options: ["Công nhân và Tư sản dân tộc", "Công nhân, Nông dân và các tầng lớp lao động khác", "Nông dân và Địa chủ yêu nước", "Trí thức và Giới chủ ngân hàng"],
-    answer: 1,
+    options: ["Công nhân và Tư sản dân tộc", "Nông dân và Địa chủ yêu nước", "Công nhân, Nông dân và các tầng lớp lao động khác", "Trí thức và Giới chủ ngân hàng"],
+    answer: 2,
     explanation: "Liên minh công - nông và trí thức lao động là nền tảng chính trị vững chắc nhất cho cuộc đấu tranh vô sản giành chính quyền."
   },
   {
     id: 14,
     question: "Theo quan điểm chủ nghĩa Mác - Lênin, cuộc đấu tranh giai cấp của vô sản gồm bao nhiêu hình thức cơ bản?",
-    options: ["2 hình thức", "3 hình thức", "4 hình thức", "5 hình thức"],
-    answer: 1,
+    options: ["2 hình thức", "4 hình thức", "5 hình thức", "3 hình thức"],
+    answer: 3,
     explanation: "Có 3 hình thức đấu tranh cơ bản: đấu tranh kinh tế, đấu tranh chính trị, và đấu tranh tư tưởng."
   },
   {
     id: 15,
     question: "Mục tiêu cuối cùng của cuộc đấu tranh giai cấp của giai cấp vô sản là gì?",
-    options: ["Được ký hợp đồng lao động vô thời hạn", "Giải phóng xã hội hoàn toàn khỏi áp bức, xây dựng xã hội cộng sản chủ nghĩa", "Sở hữu toàn bộ cổ phần của doanh nghiệp", "Thay thế giai cấp tư sản để tự làm giới chủ mới"],
-    answer: 1,
+    options: ["Được ký hợp đồng lao động vô thời hạn", "Sơ hữu toàn bộ cổ phần của doanh nghiệp", "Giải phóng xã hội hoàn toàn khỏi áp bức, xây dựng xã hội cộng sản chủ nghĩa", "Thay thế giai cấp tư sản để tự làm giới chủ mới"],
+    answer: 2,
     explanation: "Mục tiêu cuối cùng không phải là cải thiện tạm thời điều kiện sống, mà là tiêu diệt hoàn toàn áp bức giai cấp, tiến tới xã hội không còn giai cấp."
   }
 ]
@@ -242,10 +242,10 @@ export function DiceGameSection() {
 
 
   return (
-    <section id="section-13" className="min-h-screen py-24 px-4 bg-bg-surface relative flex items-center justify-center overflow-hidden">
+    <section id="section-12" className="min-h-screen py-24 px-4 bg-bg-surface relative flex items-center justify-center overflow-hidden">
       {/* Background decoration */}
       <div className="absolute top-0 right-0 text-[15rem] sm:text-[20rem] font-serif font-bold text-text-muted opacity-5 select-none leading-none -mt-16 -mr-16 pointer-events-none">
-        13
+        12
       </div>
 
       <div className="max-w-6xl mx-auto w-full z-10 relative">

@@ -23,9 +23,9 @@ export function ConclusionSection() {
   }
 
   return (
-    <section id="section-12" className="min-h-screen py-24 px-4 bg-bg-muted relative flex items-center justify-center overflow-hidden">
+    <section id="section-11" className="min-h-screen py-24 px-4 bg-bg-muted relative flex items-center justify-center overflow-hidden">
       <div className="absolute top-0 right-0 text-[10rem] sm:text-[20rem] font-serif font-bold text-black opacity-[0.03] select-none leading-none -mt-16 -mr-16 pointer-events-none">
-        12
+        11
       </div>
 
       <div className="max-w-6xl mx-auto z-10 relative w-full">

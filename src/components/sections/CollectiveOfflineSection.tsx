@@ -30,7 +30,7 @@ export function CollectiveOfflineSection() {
   return (
     <section id="section-9" className="min-h-screen py-24 px-4 bg-bg-surface relative overflow-hidden">
       <div className="absolute top-0 right-0 text-[10rem] sm:text-[20rem] font-serif font-bold text-text-muted opacity-5 select-none leading-none -mt-16 -mr-16 pointer-events-none">
-        10
+        09
       </div>
 
       <div className="max-w-5xl mx-auto z-10 relative">

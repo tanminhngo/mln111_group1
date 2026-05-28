@@ -19,7 +19,7 @@ export function AnalysisPlaceholderSection() {
   return (
     <section id="section-8" className="min-h-screen py-24 px-4 bg-bg-muted relative flex items-center justify-center">
       <div className="absolute top-0 right-0 text-[20rem] font-serif font-bold text-black opacity-[0.03] select-none leading-none -mt-16 -mr-16">
-        09
+        08
       </div>
 
       <div className="max-w-6xl mx-auto w-full z-10 relative">

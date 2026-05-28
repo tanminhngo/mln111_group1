@@ -11,12 +11,11 @@ const SECTIONS = [
   { index: 5, name: "05. Đấu tranh Truyền thống", id: "section-5" },
   { index: 6, name: "06. Đấu tranh Hiện đại", id: "section-6" },
   { index: 7, name: "07. Game Nhập vai", id: "section-7" },
-  { index: 8, name: "08. Game Ô chữ", id: "section-8" },
-  { index: 9, name: "09. Phân tích Bản chất", id: "section-9" },
-  { index: 10, name: "10. Tắt App tập thể", id: "section-10" },
-  { index: 11, name: "11. So sánh Lịch sử", id: "section-11" },
-  { index: 12, name: "12. Kết luận", id: "section-12" },
-  { index: 13, name: "13. Game Xúc xắc", id: "section-13" }
+  { index: 8, name: "08. Phân tích Bản chất", id: "section-8" },
+  { index: 9, name: "09. Tắt App tập thể", id: "section-9" },
+  { index: 10, name: "10. So sánh Lịch sử", id: "section-10" },
+  { index: 11, name: "11. Kết luận", id: "section-11" },
+  { index: 12, name: "12. Game Xúc xắc", id: "section-12" }
 ]
 
 export function Navbar() {

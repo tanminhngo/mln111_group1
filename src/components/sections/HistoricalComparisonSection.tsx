@@ -49,7 +49,7 @@ export function HistoricalComparisonSection() {
   return (
     <section id="section-10" className="min-h-screen py-24 bg-bg-base relative overflow-hidden">
       <div className="absolute top-0 right-0 text-[10rem] sm:text-[20rem] font-serif font-bold text-text-muted opacity-5 select-none leading-none -mt-16 -mr-16 pointer-events-none">
-        11
+        10
       </div>
 
       <div className="max-w-6xl mx-auto px-4 z-10 relative">
